@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  publisher:
+    build:
+      context: ./mqtt-publisher
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=example
+      - DB_NAME=mqtt_publisher
+      - MQTT_BROKER_URL=mqtt://mqtt-broker
+    depends_on:
+      - database
+      - mqtt-broker
+
+  subscriber:
+    build:
+      context: ./mqtt-subscriber
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=example
+      - DB_NAME=mqtt_subscriber
+      - MQTT_BROKER_URL=mqtt://mqtt-broker
+    depends_on:
+      - database
+      - mqtt-broker
+
+  database:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mqtt_publisher
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+volumes:
+  postgres_data:

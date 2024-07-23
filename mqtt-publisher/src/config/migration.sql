@@ -1,0 +1,7 @@
+CREATE DATABASE mqtt_publisher;
+CREATE TABLE messages (
+  id SERIAL PRIMARY KEY,
+  topic VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
